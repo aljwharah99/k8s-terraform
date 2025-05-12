@@ -76,33 +76,41 @@ $(document).ready(function () {
 
     // Function to post user data to 'api/user' endpoint
     function saveUser() {
-        const name = $('#name').val();
-        const email = $('#email').val();
-        const age = $('#age').val();
-        const address = $('#address').val();
+    const name = $('#name').val();
+    const email = $('#email').val();
+    const age = $('#age').val();
+    const address = $('#address').val();
 
-        if (activeUser.id > 0) {
-            $.ajax({
-                url: `${baseUrl}api/user/${activeUser.id}`,
-                type: "PUT",
-                data: JSON.stringify({ id: activeUser.id, name: name, email: email, age: age, address: address }),
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: addEditSuccessCallback,
-                error: addEditFailureCallback
-            });
-        } else {
-            $.ajax({
-                url: `${baseUrl}api/user`,
-                type: "POST",
-                data: JSON.stringify({ id: 0, name: name, email: email, age: age, address: address }),
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: addEditSuccessCallback,
-                error: addEditFailureCallback
-            });
-        }
+    // ✅ تحقق من أن جميع الحقول ممتلئة
+    if (!name || !email || !age || !address) {
+        showMessage('Please fill in all fields', 'error');
+        return;
     }
+
+    const payload = JSON.stringify({
+        id: activeUser.id || 0,
+        name,
+        email,
+        age,
+        address
+    });
+
+    const method = activeUser.id > 0 ? "PUT" : "POST";
+    const url = activeUser.id > 0
+        ? `${baseUrl}api/user/${activeUser.id}`
+        : `${baseUrl}api/user`;
+
+    $.ajax({
+        url,
+        type: method,
+        data: payload,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: addEditSuccessCallback,
+        error: addEditFailureCallback
+    });
+}
+
 
     // Function to open the modal for editing or adding a user
     function openUserModal() {
