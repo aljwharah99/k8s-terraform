@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: frontend-deploy
+ labels:
+   app: frontend-app
+ namespace: trainer-portal
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: frontend-app
+ template:
+   metadata:
+     name: frontend-app
+     labels:
+       app: frontend-app
+   spec:
+     volumes:
+       - name: config
+         configMap:
+           name: frontend-configmap
+           items:
+             - key: config.json
+               path: config.json
+     containers:
+       - name: frontend-app
+         image: aljwharah/frontend-trainer-portal:latest
+         ports:
+           - containerPort: 80
+         volumeMounts:
+           - name: config
+             mountPath: /usr/share/nginx/html/config.json
+             subPath: config.json
+             readOnly: true
